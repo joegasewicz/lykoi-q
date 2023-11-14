@@ -39,8 +39,8 @@ func Destroy(l *LinkedList) error {
 
 // InsertNext inserts a node after the current linked list element.
 // If the element is nil then the new element gets placed at the head
-// of the list.
-func (l *LinkedList) InsertNext(currNode *Node, data *interface{}) error {
+// of the list & then return the tail.
+func (l *LinkedList) InsertNext(currNode *Node, data *interface{}) (error, *Node) {
 	var node *Node
 	newNode := Node{
 		Next: nil,
@@ -48,10 +48,11 @@ func (l *LinkedList) InsertNext(currNode *Node, data *interface{}) error {
 	}
 	if currNode.Data == l.Head.Data {
 		if l.Head.Next != nil {
-			return errors.New("cannot add element to list as next element is not empty")
+			err := errors.New("cannot add element to list as next element is not empty")
+			return err, l.Head.Next
 		}
 		l.Head.Next = &newNode
-		return nil
+		return nil, l.Head.Next
 	}
 	node = l.Head.Next
 	for {
@@ -61,7 +62,7 @@ func (l *LinkedList) InsertNext(currNode *Node, data *interface{}) error {
 		}
 		node = node.Next
 	}
-	return nil
+	return nil, node
 }
 
 // RemoveNext removes the next element after element from the list.
