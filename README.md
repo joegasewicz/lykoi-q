@@ -1,0 +1,2 @@
+# LykoiQ
+A queue server
