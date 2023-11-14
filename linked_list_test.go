@@ -34,17 +34,24 @@ func TestLinkedList_InsertNext(t *testing.T) {
 	var data1 interface{}
 	var data2 interface{}
 	var data3 interface{}
+	var data4 interface{}
 	data1 = map[string]string{"name": "Joe"}
 	data2 = map[string]string{"age": "99"}
 	data3 = map[string]string{"cat": "cosmo"}
+	data4 = "data 4 value"
 	list := Init(&data1)
-	err := list.InsertNext(list.Head, &data2)
-	err2 := list.InsertNext(list.Head.Next, &data3)
+	node := list.Head
+	err, tail1 := list.InsertNext(node, &data2)
+	err2, tail2 := list.InsertNext(tail1, &data3)
+	err3, _ := list.InsertNext(tail2, &data4)
 	if err != nil {
 		t.Fatalf("expected nil but got %e", err)
 	}
 	if err2 != nil {
 		t.Fatalf("expected nil but got %e", err2)
+	}
+	if err3 != nil {
+		t.Fatalf("expected nil but got %e", err3)
 	}
 	if list.Head.Next.Data != &data2 {
 		t.Fatalf("expected %v to equal data2 but got %v", &data2, list.Head.Next.Data)
