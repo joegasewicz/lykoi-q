@@ -14,8 +14,15 @@ type Node struct {
 
 // Init should be called before any operation can be used on with
 // the linked list
-func Init() *Node {
-	return &Node{}
+func Init(data *interface{}) *LinkedList {
+	n := Node{
+		Data: data,
+		Next: nil,
+	}
+	return &LinkedList{
+		Size: 1,
+		Head: &n,
+	}
 }
 
 // Destroy destroys the linked list. No operations are permitted to
