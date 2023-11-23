@@ -1,7 +1,16 @@
 # LykoiQ
 A queue server
 
-### Direct Message Queue
+### Quick Start
+```
+lykoiq -p 8080 -t 3 
+```
 
+### Provider
+```
 
-### Message Broker
+```
+
+### Consumer
+
+ 
