@@ -7,7 +7,7 @@ import (
 func TestLinkedList_Init(t *testing.T) {
 	var data interface{}
 	data = 1
-	list := Init(&data)
+	list := LinkedListInit(&data)
 	if list.Size != 1 {
 		t.Fatalf("Expected 1 but got %v", list.Size)
 	}
@@ -25,8 +25,8 @@ func TestLinkedList_Init(t *testing.T) {
 func TestLinkedList_Destroy(t *testing.T) {
 	var data interface{}
 	data = map[string]string{"name": "Joe"}
-	list := Init(&data)
-	err := Destroy(list)
+	list := LinkedListInit(&data)
+	err := LinkedListDestroy(list)
 	if err != nil {
 		t.Fatalf("Expected nil but got error: %v", err.Error())
 	}
@@ -41,7 +41,7 @@ func TestLinkedList_InsertNext(t *testing.T) {
 	data2 = map[string]string{"age": "99"}
 	data3 = map[string]string{"cat": "cosmo"}
 	data4 = "data 4 test"
-	list := Init(&data1)
+	list := LinkedListInit(&data1)
 	node := list.Head
 	err, tail1 := list.InsertNext(node, &data2)
 	err2, tail2 := list.InsertNext(tail1, &data3)
@@ -75,13 +75,19 @@ func TestLinkedList_RemoveNext(t *testing.T) {
 	data2 = map[string]string{"age": "99"}
 	data3 = map[string]string{"cat": "cosmo"}
 	data4 = "data 4 test"
-	list := Init(&data1)
+	list := LinkedListInit(&data1)
 	node := list.Head
 	_, tail1 := list.InsertNext(node, &data2)
 	_, tail2 := list.InsertNext(tail1, &data3)
-	list.InsertNext(tail2, &data4)
-	err := list.RemoveNext(tail2)
-
+	_, tail3 := list.InsertNext(tail2, &data4)
+	err, nodeData := list.RemoveNext(tail2)
+	if nodeData != tail3.Data {
+		t.Fatalf("expected nodeData to equal tail3.Data but got %v", tail3.Data)
+	}
+	// Check head
+	if list.Head.Data != &data1 {
+		t.Fatalf("expected the head to be equal to &data1 but got %v", list.Head.Data)
+	}
 	if err != nil {
 		t.Fatalf("expected nil but got %e", err)
 	}
@@ -94,11 +100,14 @@ func TestLinkedList_RemoveNext(t *testing.T) {
 	if node.Next.Next.Next != nil {
 		t.Fatalf("expected nil but got %v", node.Next.Next.Next)
 	}
-	list.RemoveNext(nil)
-	if list.Head != nil {
-		t.Fatalf("expect Head of list to be nil but got %v", list.Head)
+	// test get head
+	err, headData := list.RemoveNext(nil)
+	if err != nil {
+		t.Fatalf("expected nil but got %e", err)
 	}
-
+	if headData != &data1 {
+		t.Fatalf("expect Head data to be equal to &data1 but got %v", headData)
+	}
 }
 
 func TestLinkedList_ListSize(t *testing.T) {
@@ -111,7 +120,7 @@ func TestLinkedList_ListSize(t *testing.T) {
 	data2 = map[string]string{"age": "99"}
 	data3 = map[string]string{"cat": "cosmo"}
 	data4 = "data 4 test"
-	list := Init(&data1)
+	list := LinkedListInit(&data1)
 	node := list.Head
 	count = list.ListSize()
 	if count != 1 {
@@ -149,7 +158,7 @@ func TestLinkedList_ListHead(t *testing.T) {
 	var data2 interface{}
 	data1 = map[string]string{"name": "Joe"}
 	data2 = map[string]string{"age": "99"}
-	list := Init(&data1)
+	list := LinkedListInit(&data1)
 	head := list.Head
 	result := list.ListHead()
 	list.InsertNext(head, &data2)
@@ -168,7 +177,7 @@ func TestLinkedList_ListTail(t *testing.T) {
 	data2 = map[string]string{"age": "99"}
 	data3 = map[string]string{"cat": "cosmo"}
 	data4 = "data 4 test"
-	list := Init(&data1)
+	list := LinkedListInit(&data1)
 	node := list.Head
 	tail = list.ListTail()
 	if tail != node {
@@ -200,7 +209,7 @@ func TestLinkedList_IsHead(t *testing.T) {
 	data2 = map[string]string{"age": "99"}
 	data3 = map[string]string{"cat": "cosmo"}
 	data4 = "data 4 test"
-	list := Init(&data1)
+	list := LinkedListInit(&data1)
 	head := list.Head
 	if list.IsHead(head) != true {
 		t.Fatalf("expected true but got false")
@@ -225,7 +234,7 @@ func TestLinkedList_IsTail(t *testing.T) {
 	data2 = map[string]string{"age": "99"}
 	data3 = map[string]string{"cat": "cosmo"}
 	data4 = "data 4 test"
-	list := Init(&data1)
+	list := LinkedListInit(&data1)
 	head := list.Head
 	if list.IsTail(head) != true {
 		t.Fatalf("expected true but got false")
@@ -262,7 +271,7 @@ func TestLinkedList_Evaluate(t *testing.T) {
 	data2 = map[string]string{"age": "99"}
 	data3 = map[string]string{"cat": "cosmo"}
 	data4 = "data 4 test"
-	list := Init(&data1)
+	list := LinkedListInit(&data1)
 	node := list.Head
 	_, result := list.Evaluate(node)
 	if result != node.Data {
@@ -290,7 +299,7 @@ func TestLinkedList_NextNode(t *testing.T) {
 	data2 = map[string]string{"age": "99"}
 	data3 = map[string]string{"cat": "cosmo"}
 	data4 = "data 4 test"
-	list := Init(&data1)
+	list := LinkedListInit(&data1)
 	node := list.Head
 	_, tail1 := list.InsertNext(node, &data2)
 	_, result := list.NextNode(node)

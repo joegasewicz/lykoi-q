@@ -14,9 +14,9 @@ type Node struct {
 	Data *interface{}
 }
 
-// Init should be called before any operation can be used on with
+// LinkedListInit should be called before any operation can be used on with
 // the linked list
-func Init(data *interface{}) *LinkedList {
+func LinkedListInit(data *interface{}) *LinkedList {
 	n := Node{
 		Data: data,
 		Next: nil,
@@ -28,12 +28,12 @@ func Init(data *interface{}) *LinkedList {
 	}
 }
 
-// Destroy destroys the linked list. No operations are permitted to
-// be called on the linked list after Destroy is called
-func Destroy(l *LinkedList) error {
+// LinkedListDestroy destroys the linked list. No operations are permitted to
+// be called on the linked list after LinkedListDestroy is called
+func LinkedListDestroy(l *LinkedList) error {
 	l = nil
 	if l != nil {
-		return errors.New("expected list to be nil")
+		return errors.New("couldn't delete linkedlist memory")
 	}
 	return nil
 }
@@ -69,30 +69,31 @@ func (l *LinkedList) InsertNext(currNode *Node, data *interface{}) (error, *Node
 	}
 }
 
-// RemoveNext removes the next element after node.
-// If node is nil then the head of the list is removed
-func (l *LinkedList) RemoveNext(node *Node) error {
+// RemoveNext removes the next element after node & returns an error
+// if one exists & the removed node's data. If the node is nil then the
+// head of the list is removed & the head's data returned.
+func (l *LinkedList) RemoveNext(node *Node) (error, *interface{}) {
 	currNode := l.Head
+	// if node is nil then remove the head & return the head's data
 	if node == nil {
-		l.Head = nil
-		l.Size = 0
-		l.Tail = nil
-		return nil
+		headData := l.Head.Data
+		l.Head = l.Head.Next
+		l.Size--
+		return nil, headData
 	}
 	for {
 		if currNode == node {
 			if currNode.Next != nil {
+				currNodeNextData := currNode.Next.Data
 				currNode.Next = nil
 				l.Size--
-				l.Head = currNode
-				break
+				return nil, currNodeNextData
 			} else {
-				return errors.New("no next node")
+				return errors.New("no next node"), nil
 			}
 		}
 		currNode = currNode.Next
 	}
-	return nil
 }
 
 // ListSize returns the total number of nodes in the list.
