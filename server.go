@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -13,11 +14,13 @@ type QueueServer struct {
 
 // HandleProvider
 
-func (s *QueueServer) HandleProvider(queue *Queue) func(w http.ResponseWriter, r *http.Request) {
+func (s *QueueServer) HandleProvider(queue *Queue, logging *Logging) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var data ProviderReq
 		var message interface{}
 		var createdOn time.Time
+		var jsonRes ProviderRes
+		var jsonData []byte
 		body, err := io.ReadAll(r.Body)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
@@ -34,22 +37,28 @@ func (s *QueueServer) HandleProvider(queue *Queue) func(w http.ResponseWriter, r
 		createdOn = time.Now()
 		err = queue.Enqueue(&message)
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			fmt.Fprintf(w, "Queue error\n")
-			return
+			goto Errors
 		}
 		w.Header().Set("Content-Type", "application/json")
-		jsonRes := ProviderRes{
+		jsonRes = ProviderRes{
 			ID:        queue.LinkedList.ListTail().ID,
 			CreatedOn: createdOn,
 		}
-		jsonData, err := json.Marshal(jsonRes)
+		jsonData, err = json.Marshal(jsonRes)
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			fmt.Fprintf(w, "Server error\n")
-			return
+			goto Errors
 		}
-		fmt.Fprintf(w, string(jsonData))
+		_, err = fmt.Fprintf(w, string(jsonData))
+		if err != nil {
+			goto Errors
+		}
+		logging.Log("Messaged ID:", strconv.Itoa(jsonRes.ID))
+		return
+	Errors:
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprintf(w, "Server error\n%e", err)
+		return
+
 	}
 
 }

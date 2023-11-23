@@ -13,12 +13,13 @@ func main() {
 	server := QueueServer{}
 	args := os.Args
 	queue := QueueInit(false)
-	logging := NewLogging(config.Level, 1)
 
 	config.Process(args)
+
+	logging := NewLogging(config.Level, 1)
 	logging.Log(fmt.Sprintf("Starting server on %d", config.Port), "test")
 
-	http.HandleFunc("/enqueue", server.HandleProvider(queue))
+	http.HandleFunc("/enqueue", server.HandleProvider(queue, logging))
 	http.HandleFunc("/dequeue", server.HandleConsumer)
 
 	err := http.ListenAndServe(":8080", nil)
