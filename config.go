@@ -1,9 +1,27 @@
 package main
 
+import (
+	"errors"
+	"fmt"
+	"strconv"
+)
+
 type Config struct {
 	Level   string
 	Threads uint8
 	Port    int
+}
+
+func (c *Config) getIntFromArg(args []string, flag string, index int) (int, error) {
+	var err error
+	if len(args) == index {
+		return 0, errors.New(fmt.Sprintf("missing %s argument value", flag))
+	}
+	argInt, err := strconv.Atoi(args[index+1])
+	if err != nil {
+		return 0, errors.New(fmt.Sprintf("didn't pass a correct argument to %s", flag))
+	}
+	return argInt, err
 }
 
 func (c *Config) Process(args []string) {
@@ -13,7 +31,7 @@ func (c *Config) Process(args []string) {
 				switch arg {
 				case "-p":
 					{
-						argResult, err := GetIntFromArg(args, "-p", i)
+						argResult, err := c.getIntFromArg(args, "-p", i)
 						if err != nil {
 							panic(err)
 						}
@@ -22,7 +40,7 @@ func (c *Config) Process(args []string) {
 					}
 				case "-t":
 					{
-						argResult, err := GetIntFromArg(args, "-t", i)
+						argResult, err := c.getIntFromArg(args, "-t", i)
 						if err != nil {
 							panic(err)
 						}
@@ -34,7 +52,6 @@ func (c *Config) Process(args []string) {
 						c.Level = DEBUG
 						continue
 					}
-
 				}
 			}
 		}
