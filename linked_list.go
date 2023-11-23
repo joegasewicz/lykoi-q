@@ -3,15 +3,17 @@ package main
 import "errors"
 
 type LinkedList struct {
-	Size int
-	Head *Node
-	Tail *Node
+	Size      int
+	Head      *Node
+	Tail      *Node
+	currentID int
 }
 
 // Node is the first node in the list
 type Node struct {
 	Next *Node
 	Data *interface{}
+	ID   int
 }
 
 // LinkedListInit should be called before any operation can be used on with
@@ -20,6 +22,7 @@ func LinkedListInit(data *interface{}) *LinkedList {
 	n := Node{
 		Data: data,
 		Next: nil,
+		ID:   1,
 	}
 	return &LinkedList{
 		Size: 1,
@@ -46,6 +49,7 @@ func (l *LinkedList) InsertNext(currNode *Node, data *interface{}) (error, *Node
 	newNode := Node{
 		Next: nil,
 		Data: data,
+		ID:   1,
 	}
 	if currNode.Data == l.Head.Data {
 		if l.Head.Next != nil {
@@ -54,6 +58,7 @@ func (l *LinkedList) InsertNext(currNode *Node, data *interface{}) (error, *Node
 		}
 		l.Head.Next = &newNode
 		l.Size++
+		l.incrementID(l.Head.Next)
 		l.Tail = &newNode
 		return nil, l.Head.Next
 	}
@@ -62,6 +67,7 @@ func (l *LinkedList) InsertNext(currNode *Node, data *interface{}) (error, *Node
 		if currNode.Data == node.Data || node.Next == nil {
 			node.Next = &newNode
 			l.Size++
+			l.incrementID(&newNode)
 			l.Tail = &newNode
 			return nil, node.Next
 		}
@@ -169,4 +175,9 @@ func (l *LinkedList) NextNode(node *Node) (error, *Node) {
 		currNode = currNode.Next
 	}
 	return err, nil
+}
+
+func (l *LinkedList) incrementID(currentNode *Node) {
+	l.currentID++
+	currentNode.ID = l.currentID
 }

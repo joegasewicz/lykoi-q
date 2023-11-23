@@ -1,10 +1,12 @@
 package main
 
+import "time"
+
 type ProviderReq struct {
 	Message string `json:"message"`
 }
 
 type ProviderRes struct {
-	ID        uint32
-	CreatedOn string
+	ID        int       `json:"id"`
+	CreatedOn time.Time `json:"created_on"`
 }
