@@ -78,22 +78,22 @@ func (l *LinkedList) InsertNext(currNode *Node, data *interface{}) (error, *Node
 // RemoveNext removes the next element after node & returns an error
 // if one exists & the removed node's data. If the node is nil then the
 // head of the list is removed & the head's data returned.
-func (l *LinkedList) RemoveNext(node *Node) (error, *interface{}) {
+func (l *LinkedList) RemoveNext(node *Node) (error, *Node) {
 	currNode := l.Head
 	// if node is nil then remove the head & return the head's data
 	if node == nil {
-		headData := l.Head.Data
+		headNode := l.Head
 		l.Head = l.Head.Next
 		l.Size--
-		return nil, headData
+		return nil, headNode
 	}
 	for {
 		if currNode == node {
 			if currNode.Next != nil {
-				currNodeNextData := currNode.Next.Data
+				currNodeNextNode := currNode.Next
 				currNode.Next = nil
 				l.Size--
-				return nil, currNodeNextData
+				return nil, currNodeNextNode
 			} else {
 				return errors.New("no next node"), nil
 			}

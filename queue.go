@@ -61,7 +61,7 @@ func (q *Queue) Enqueue(data *interface{}) error {
 
 // Dequeue removes element at head of queue, then returns an error
 // if one exists & the head's data.
-func (q *Queue) Dequeue() (error, *interface{}) {
+func (q *Queue) Dequeue() (error, *Node) {
 	return q.LinkedList.RemoveNext(nil)
 }
 
