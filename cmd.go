@@ -20,7 +20,7 @@ func main() {
 	logging.Log(fmt.Sprintf("Starting server on %d", config.Port), "test")
 
 	http.HandleFunc("/enqueue", server.HandleProvider(queue, logging))
-	http.HandleFunc("/dequeue", server.HandleConsumer)
+	http.HandleFunc("/dequeue", server.HandleConsumer(queue, logging))
 
 	err := http.ListenAndServe(":8080", nil)
 	if err != nil {
